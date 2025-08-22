@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Download Center</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -42,6 +46,8 @@
     .icon {
       font-size: 28px;
       flex-shrink: 0;
+      width: 32px;
+      text-align: center;
     }
     .info {
       flex-grow: 1;
@@ -105,7 +111,7 @@
   </div>
 
   <script>
-    const SHEET_URL = "LINK_CSV_CUA_BAN"; // Thay bằng link CSV Google Sheet
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g/edit?usp=sharing"; // Thay bằng link CSV Google Sheet
 
     // Load danh sách
     fetch(SHEET_URL)
@@ -116,9 +122,15 @@
       rows.forEach((r,i) => {
         let [title, desc, link, icon] = r.split(",");
         if(!title || !link) return;
+
+        // Nếu có icon FA thì thêm, không thì mặc định 💻
+        let iconHTML = icon && icon.trim() 
+          ? `<i class="${icon.trim()}"></i>` 
+          : "💻";
+
         html += `
           <div class="card" style="animation-delay:${0.1*i}s">
-            <div class="icon">${icon || "💻"}</div>
+            <div class="icon">${iconHTML}</div>
             <div class="info">
               <h2>${title}</h2>
               <p>${desc || ""}</p>
