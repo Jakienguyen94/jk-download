@@ -1,303 +1,245 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
   <title>Tổng hợp phần mềm</title>
   <style>
-    /* ---------- (giữ nguyên toàn bộ CSS từ trước, không thay đổi) ---------- */
-    :root{
-      --bg: #0b0b10;
-      --card: #12121a;
-      --muted: #8a8aa0;
-      --text: #e9e9ef;
-      --ring: #6b6bff;
-      --border: #232336;
-      --btn-bg: linear-gradient(135deg,#7c3aed, #06b6d4);
-      --btn-bg-hover: linear-gradient(135deg,#6d28d9, #0891b2);
-      --btn-text: #ffffff;
-      --chip-bg: rgba(124,58,237,.15);
-      --chip-text: #c4b5fd;
-      --toggle-bg: rgba(124,58,237,.2);
-      --toggle-dot: #7c3aed;
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #6a85b6, #bac8e0, #d6a4a4);
+      margin: 0;
+      padding: 20px;
+      color: #333;
     }
-    .theme-simple{
-      --btn-bg: #7c3aed;
-      --btn-bg-hover: #6d28d9;
-      --btn-text: #ffffff;
-      --chip-bg: rgba(124,58,237,.15);
-      --chip-text: #d6bcfa;
-      --toggle-bg: #2a2340;
-      --toggle-dot: #7c3aed;
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
     }
-    *{ box-sizing:border-box }
-    html,body{ height:100% }
-    body{
-      margin:0;
-      background: radial-gradient(1200px 600px at 70% -10%, #1e1e2a 0%, transparent 60%) , var(--bg);
-      color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      line-height:1.45;
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #444;
     }
-    .container{
-      max-width:1000px; margin:40px auto; padding:0 16px;
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 15px;
     }
-    .header{
-      display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-      margin-bottom:18px;
+    input, select, button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
     }
-    .title{
-      font-size: clamp(22px, 4vw, 32px);
-      font-weight:800; letter-spacing: .2px;
-      display:flex; align-items:center; gap:10px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
     }
-    .title .dot{ width:10px; height:10px; border-radius:50%; background:var(--ring); box-shadow:0 0 16px var(--ring) }
-    .toolbar{
-      display:flex; gap:10px; flex-wrap:wrap;
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+      white-space: nowrap;
     }
-    .control{
-      background: rgba(255,255,255,0.03);
-      border:1px solid var(--border);
-      border-radius:14px; padding:10px 12px;
-      display:flex; align-items:center; gap:10px; min-height:44px;
+    th {
+      cursor: pointer;
+      background: #f8f8f8;
+      font-weight: 600;
     }
-    .control input[type="search"]{
-      background: transparent; color:var(--text);
-      border:none; outline:none; width:220px; font-size:14px;
+    .btn-download {
+      display: inline-block;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
-    .control select{
-      background: transparent; color:var(--text);
-      border:none; outline:none; font-size:14px;
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .theme-toggle{
-      display:flex; gap:6px; background: rgba(255,255,255,0.04);
-      border:1px solid var(--border); padding:6px; border-radius:14px;
+    .rainbow-text {
+      font-weight: bold;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .toggle-btn{
-      cursor:pointer; user-select:none;
-      padding:8px 12px; border-radius:10px; font-weight:600; font-size:13px;
-      border:1px solid transparent;
-      background:var(--toggle-bg);
-      color:var(--text);
-      transition: transform .12s ease, background .2s ease, border-color .2s ease;
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 15px;
+      gap: 10px;
+      font-size: 14px;
     }
-    .toggle-btn.active{
-      border-color: var(--ring);
-      box-shadow: 0 0 0 2px rgba(107,107,255,.15) inset;
-      transform: translateY(-1px);
+    .pagination button {
+      padding: 5px 10px;
+      border: none;
+      background: #eee;
+      border-radius: 6px;
+      cursor: pointer;
     }
-
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border:1px solid var(--border);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+    .pagination button.active {
+      background: #6a11cb;
+      color: #fff;
     }
-    table{
-      width:100%; border-collapse:separate; border-spacing:0;
+    /* Popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right:0; bottom:0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
     }
-    thead th{
-      text-align:left; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
-      color:var(--muted); padding:14px 16px; background:rgba(255,255,255,.02);
-      position: sticky; top:0; z-index:1; backdrop-filter: blur(6px);
-      border-bottom:1px solid var(--border);
-    }
-    tbody td{
-      padding:14px 16px; border-bottom:1px dashed rgba(255,255,255,.06);
-      vertical-align: middle;
-    }
-    tbody tr:hover{ background: rgba(255,255,255,.02) }
-    .col-stt{ width:72px }
-    .name{
-      font-weight:700; font-size:15px;
-    }
-    .tab-chip{
-      display:inline-flex; align-items:center; gap:8px;
-      font-size:12px; font-weight:700; letter-spacing:.02em;
-      background: var(--chip-bg); color: var(--chip-text);
-      padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.08);
-    }
-    .dl-btn{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 14px; border-radius:12px; font-weight:800; letter-spacing:.2px;
-      text-decoration:none; border:0; outline:0; cursor:pointer;
-      background: var(--btn-bg); color: var(--btn-text);
-      box-shadow: 0 10px 20px rgba(124,58,237,.25);
-      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease, background .2s ease;
-    }
-    .dl-btn:hover{ transform: translateY(-1px); filter: saturate(1.05); box-shadow: 0 14px 28px rgba(124,58,237,.33); background: var(--btn-bg-hover) }
-    .dl-btn svg{ width:18px; height:18px }
-
-    .footer{
-      padding:14px 16px; color:var(--muted); font-size:12px; text-align:right;
-    }
-    .empty{
-      text-align:center; padding:36px; color:var(--muted)
-    }
-    .status{
-      font-size:12px; color:var(--muted); margin:10px 2px 0;
-    }
-
-    @media (max-width:700px){
-      .control input[type="search"]{ width:150px }
-      .name{ font-size:14px }
+    .popup-content {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      font-size: 15px;
+      color: #333;
     }
   </style>
 </head>
-<body class="theme-gradient">
+<body>
   <div class="container">
-    <div class="header">
-      <div class="title"><span class="dot"></span> Tổng hợp phần mềm</div>
-      <div class="toolbar">
-        <div class="theme-toggle" role="group" aria-label="Đổi chủ đề">
-          <button class="toggle-btn active" data-theme="gradient" title="Gradient">Gradient</button>
-          <button class="toggle-btn" data-theme="simple" title="Simple tím">Simple</button>
-        </div>
-        <div class="control" title="Tìm kiếm theo tên hoặc tab">
-          🔎
-          <input id="search" type="search" placeholder="Tìm theo tên, tab..." />
-        </div>
-        <div class="control" title="Sắp xếp theo tên">
-          ↕️
-          <select id="sort">
-            <option value="name-asc">Tên (A → Z)</option>
-            <option value="name-desc">Tên (Z → A)</option>
-          </select>
-        </div>
-        <div class="control" title="Lọc theo Tab">
-          🗂️
-          <select id="filterTab">
-            <option value="">Tất cả Tab</option>
-          </select>
-        </div>
-      </div>
+    <h2>Tổng hợp phần mềm</h2>
+    <div class="controls">
+      <input type="text" id="search" placeholder="Tìm kiếm...">
+      <select id="tabFilter"><option value="">-- Lọc theo Tab --</option></select>
+      <select id="rowsPerPage">
+        <option value="20">20</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
     </div>
+    <table>
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tên phần mềm</th>
+          <th>Tab</th>
+          <th>Upload</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </div>
 
-    <div class="status" id="status">Đang tải dữ liệu từ Google Sheet...</div>
-
-    <div class="card" role="region" aria-label="Bảng phần mềm">
-      <table id="table">
-        <thead>
-          <tr>
-            <th class="col-stt">STT</th>
-            <th>Tên phần mềm</th>
-            <th>Tab</th>
-            <th>Link tải xuống</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr><td colspan="4" class="empty">Đang tải...</td></tr>
-        </tbody>
-      </table>
-      <div class="footer" id="footer">—</div>
-    </div>
+  <div class="popup" id="popup">
+    <div class="popup-content">Đang chuyển trang...</div>
   </div>
 
   <script>
-    const SHEET_ID   = "15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g";
+    const SHEET_ID = "15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g";
     const SHEET_NAME = "Sheet1";
-    let rawRows = [], viewRows = [], currentTheme = "gradient";
+    const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
 
-    document.querySelectorAll('.toggle-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        const t = btn.dataset.theme;
-        currentTheme = t;
-        document.body.classList.toggle('theme-simple', t==='simple');
-      });
-    });
+    let data = [], filteredData = [];
+    let currentPage = 1, rowsPerPage = 20;
 
-    const searchEl = document.getElementById('search');
-    const sortEl   = document.getElementById('sort');
-    const filterTabEl = document.getElementById('filterTab');
-
-    searchEl.addEventListener('input', debounce(() => applyFiltersAndRender(), 120));
-    sortEl.addEventListener('change', applyFiltersAndRender);
-    filterTabEl.addEventListener('change', applyFiltersAndRender);
-
-    function buildGvizUrl(){
-      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json`;
-    }
-
-    async function fetchSheet(){
-      const status = document.getElementById('status');
-      try {
-        const res = await fetch(buildGvizUrl());
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
-        const json = JSON.parse(text.replace(/^.*setResponse\(|\);\s*$/g, ''));
-        const rows = (json.table.rows||[]).map(r=>({
-          stt: r.c[0]?.v ?? "",
-          name: r.c[1]?.v?.toString() ?? "",
-          tab: r.c[2]?.v?.toString() ?? "",
-          download: r.c[3]?.v?.toString() ?? ""
-        })).filter(x=> x.name || x.tab || x.download);
-        rawRows = rows;
-        status.textContent = rows.length ? `Đã tải ${rows.length} mục.` : "Không có dữ liệu.";
-        populateFilterTabs();
-        applyFiltersAndRender();
-      } catch(err) {
-        console.error(err);
-        document.getElementById('status').textContent = "Lỗi tải dữ liệu từ Sheet.";
-      }
-    }
-
-    function populateFilterTabs(){
-      const tabs = Array.from(new Set(rawRows.map(r => r.tab))).sort((a,b)=>a.localeCompare(b,'vi'));
-      filterTabEl.innerHTML = `<option value="">Tất cả Tab</option>` + tabs.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
-    }
-
-    function applyFiltersAndRender(){
-      const s = (searchEl.value||"").toLowerCase().trim();
-      const f = filterTabEl.value;
-      viewRows = rawRows.filter(r => {
-        const checkText = `${r.name} ${r.tab}`.toLowerCase();
-        return (!s || checkText.includes(s)) && (!f || r.tab === f);
-      });
-      if (sortEl.value==='name-asc') viewRows.sort((a,b)=>a.name.localeCompare(b.name,'vi'));
-      else if (sortEl.value==='name-desc') viewRows.sort((a,b)=>b.name.localeCompare(a.name,'vi'));
+    async function fetchData() {
+      const res = await fetch(API_URL);
+      data = await res.json();
+      filteredData = data;
+      loadTabFilter();
       renderTable();
     }
 
-    function renderTable(){
-      const tbody = document.getElementById('tbody');
-      const footer = document.getElementById('footer');
-      if (!viewRows.length){
-        tbody.innerHTML = `<tr><td colspan="4" class="empty">Không có kết quả phù hợp.</td></tr>`;
-        footer.textContent = "—";
-        return;
+    function loadTabFilter() {
+      const tabs = [...new Set(data.map(item => item.Tab))];
+      const tabFilter = document.getElementById("tabFilter");
+      tabs.forEach(tab => {
+        const opt = document.createElement("option");
+        opt.value = tab; opt.textContent = tab;
+        tabFilter.appendChild(opt);
+      });
+    }
+
+    function renderTable() {
+      const tableBody = document.getElementById("tableBody");
+      tableBody.innerHTML = "";
+      let start = (currentPage-1) * rowsPerPage;
+      let end = start + rowsPerPage;
+      let pageData = filteredData.slice(start, end);
+
+      pageData.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.STT}</td>
+          <td>${row["Tên phần mềm"]}</td>
+          <td>${row.Tab}</td>
+          <td class="rainbow-text">${row.Upload || ""}</td>
+          <td><button class="btn-download" onclick="showPopup('${row['Link tải xuống']}')">Download</button></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+      let totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      for (let i=1; i<=totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add("active");
+        btn.onclick = () => { currentPage = i; renderTable(); };
+        pagination.appendChild(btn);
       }
-      const html = viewRows.map(r => {
-        const link = r.download.trim();
-        const btn = link ? `<a class="dl-btn" href="${encodeURIComponentLink(link)}" target="_blank" rel="noopener">
-                              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"
-                                      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                              </svg>Download</a>`
-                          : `<span style="color:var(--muted)">—</span>`;
-        return `<tr>
-                  <td class="col-stt">${escapeHtml(r.stt)}</td>
-                  <td class="name">${escapeHtml(r.name)}</td>
-                  <td><span class="tab-chip">#${escapeHtml(r.tab)}</span></td>
-                  <td>${btn}</td>
-                </tr>`;
-      }).join('');
-      tbody.innerHTML = html;
-      footer.textContent = `Hiển thị ${viewRows.length} mục`;
     }
 
-    function escapeHtml(str){
-      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-    function encodeURIComponentLink(url){
-      try { return new URL(url).toString(); }
-      catch { return url.replace(/"/g, '%22').replace(/ /g, '%20'); }
-    }
-    function debounce(fn, d){ let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), d); }; }
+    document.getElementById("search").addEventListener("input", e => {
+      const keyword = e.target.value.toLowerCase();
+      filteredData = data.filter(item =>
+        item["Tên phần mềm"].toLowerCase().includes(keyword) ||
+        item.Tab.toLowerCase().includes(keyword)
+      );
+      currentPage = 1;
+      renderTable();
+    });
 
-    fetchSheet();
+    document.getElementById("tabFilter").addEventListener("change", e => {
+      const val = e.target.value;
+      filteredData = val ? data.filter(item => item.Tab === val) : data;
+      currentPage = 1;
+      renderTable();
+    });
+
+    document.getElementById("rowsPerPage").addEventListener("change", e => {
+      rowsPerPage = parseInt(e.target.value);
+      currentPage = 1;
+      renderTable();
+    });
+
+    function showPopup(link) {
+      const popup = document.getElementById("popup");
+      popup.style.display = "flex";
+      setTimeout(() => {
+        popup.style.display = "none";
+        window.open(link, "_blank");
+      }, 1500);
+    }
+
+    fetchData();
   </script>
 </body>
 </html>
