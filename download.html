@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đang chuẩn bị tải...</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg,#89f7fe,#66a6ff);
+      color: #fff;
+      text-align: center;
+    }
+    h1 { font-size: 20px; margin-bottom: 10px; }
+    p { font-size: 14px; margin: 5px 0; }
+    .count {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    .btn {
+      padding: 10px 20px;
+      background: linear-gradient(45deg,#ff9966,#ff5e62);
+      border: none;
+      border-radius: 25px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0.9;
+      text-decoration: none;
+    }
+    .btn:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+  <h1 id="title">Chuẩn bị tải xuống...</h1>
+  <p>Vui lòng chờ <span class="count" id="count">5</span> giây</p>
+  <a id="directLink" class="btn" style="display:none;">Tải ngay</a>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileUrl = urlParams.get("url");
+    const fileTitle = urlParams.get("title") || "Tệp tin";
+
+    document.getElementById("title").innerText = "📦 " + fileTitle;
+
+    let count = 5;
+    const counter = document.getElementById("count");
+    const linkBtn = document.getElementById("directLink");
+    linkBtn.href = fileUrl;
+
+    let timer = setInterval(() => {
+      count--;
+      counter.innerText = count;
+      if (count <= 0) {
+        clearInterval(timer);
+        counter.innerText = "0";
+        linkBtn.style.display = "inline-block";
+        window.location.href = fileUrl; // tự động tải
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
