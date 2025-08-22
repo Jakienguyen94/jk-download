@@ -1,1 +1,314 @@
-demo
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bảng dữ liệu từ Google Sheet</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Màu nền chuyển nhẹ, glassmorphism */
+    body { background: radial-gradient(1200px 600px at 80% -10%, rgba(99,102,241,.15), transparent),
+                   radial-gradient(1000px 800px at -10% 10%, rgba(16,185,129,.12), transparent),
+                   #0b1220; }
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.06); }
+    .scroll-shadow { box-shadow: inset 0 8px 8px -8px rgba(0,0,0,.4), inset 0 -8px 8px -8px rgba(0,0,0,.4);}    
+    .th-hover:hover { background: rgba(255,255,255,.06); }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen">
+  <div class="max-w-7xl mx-auto p-4 md:p-8">
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl md:text-4xl font-bold tracking-tight">Dữ liệu Google Sheet</h1>
+        <p class="text-slate-300 mt-1">Hiển thị trực tiếp từ Google Sheet, có tìm kiếm, sắp xếp, phân trang.</p>
+      </div>
+      <div class="hidden md:flex gap-2">
+        <button id="btnRefresh" class="inline-flex items-center gap-2 rounded-2xl px-4 py-2 glass hover:bg-white/10 transition">
+          <i data-lucide="refresh-ccw" class="w-4 h-4"></i><span>Tải lại</span>
+        </button>
+        <a target="_blank" id="sheetLink" href="#" class="inline-flex items-center gap-2 rounded-2xl px-4 py-2 glass hover:bg-white/10 transition">
+          <i data-lucide="sheet" class="w-4 h-4"></i><span>Mở Sheet</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Controls -->
+    <section class="glass rounded-3xl p-4 md:p-6 shadow-xl mb-6">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <div class="relative flex-1 md:w-96">
+            <input id="searchInput" type="text" placeholder="Tìm theo từ khóa..." class="w-full rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 px-4 py-2 pr-10 placeholder:text-slate-400"/>
+            <i data-lucide="search" class="w-4 h-4 absolute right-3 top-2.5 opacity-60"></i>
+          </div>
+          <button id="btnClear" class="rounded-2xl px-3 py-2 glass hover:bg-white/10" title="Xóa tìm kiếm">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <label class="text-sm text-slate-300">Hàng/trang</label>
+          <select id="pageSize" class="rounded-2xl bg-white/5 border border-white/10 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400/50">
+            <option>10</option>
+            <option selected>25</option>
+            <option>50</option>
+            <option>100</option>
+          </select>
+          <button id="btnCopy" class="rounded-2xl px-3 py-2 glass hover:bg-white/10" title="Sao chép dữ liệu hiển thị">
+            <i data-lucide="clipboard" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Table container -->
+    <section class="glass rounded-3xl shadow-2xl overflow-hidden">
+      <div class="overflow-auto scroll-shadow max-h-[70vh]" id="tableViewport">
+        <table id="dataTable" class="w-full text-left align-middle">
+          <thead class="sticky top-0 bg-white/5 backdrop-blur z-10">
+            <tr id="theadRow" class="text-slate-200 text-sm">
+              <!-- Header cells injected here -->
+            </tr>
+          </thead>
+          <tbody id="tbody" class="divide-y divide-white/5">
+            <!-- Data rows injected here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer / pagination -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-white/10 bg-white/5">
+        <div id="statusText" class="text-sm text-slate-300">Đang tải...</div>
+        <div class="flex items-center gap-2">
+          <button id="prevPage" class="rounded-xl px-3 py-2 glass hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+          <span id="pageInfo" class="text-sm tabular-nums">1 / 1</span>
+          <button id="nextPage" class="rounded-xl px-3 py-2 glass hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Help -->
+    <details class="mt-6 glass rounded-3xl p-4">
+      <summary class="cursor-pointer font-semibold">Hướng dẫn kết nối Google Sheet (nhấn để xem)</summary>
+      <ol class="list-decimal ml-6 mt-3 space-y-2 text-slate-300">
+        <li>Tạo/ mở Google Sheet của bạn. Hàng đầu tiên phải là tiêu đề cột.</li>
+        <li>Chia sẻ Sheet: <em>Share → General access → Anyone with the link → Viewer</em>.</li>
+        <li>Lấy <strong>SHEET_ID</strong> (chuỗi giữa <code>/d/</code> và <code>/edit</code> trên URL). Lấy <strong>gid</strong> của sheet (ở cuối URL: <code>#gid=...</code>).</li>
+        <li>Trong mã bên dưới, thay <code>SHEET_ID</code> và <code>GID</code> cho đúng.</li>
+        <li>Tuỳ chọn: dùng tham số <code>QUERY</code> để lọc theo Google Visualization (VD: <code>select * where A is not null</code>).</li>
+      </ol>
+    </details>
+  </div>
+
+  <script>
+    // ====== CẤU HÌNH ======
+    // Thay bằng ID thật của bạn
+    const SHEET_ID = "15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g"; // <-- thay!
+    const GID = "0"; // <-- thay! gid của sheet (tab)
+    const QUERY = ""; // ví dụ: "select * where A is not null"
+
+    // ====== HÀM TIỆN ÍCH ======
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    function gvizUrl(sheetId, gid, query="") {
+      const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq`;
+      const params = new URLSearchParams({ tqx: "out:json", gid });
+      if (query) params.set("tq", query);
+      return `${base}?${params.toString()}`;
+    }
+
+    function parseGVizJson(text) {
+      // Phản hồi có dạng: google.visualization.Query.setResponse({...});
+      const start = text.indexOf("(");
+      const end = text.lastIndexOf(")");
+      return JSON.parse(text.slice(start+1, end));
+    }
+
+    function formatCell(c) {
+      if (!c) return "";
+      // Dùng giá trị đã định dạng nếu có
+      if (c.f != null) return c.f;
+      if (c.v == null) return "";
+      if (typeof c.v === 'object') return JSON.stringify(c.v);
+      return String(c.v);
+    }
+
+    // ====== STATE ======
+    const state = {
+      allRows: [], // mảng các đối tượng {colKey: value}
+      columns: [], // [{key,label}]
+      sort: { key: null, dir: 1 },
+      filterText: "",
+      page: 1,
+      pageSize: 25,
+    };
+
+    // ====== KẾT XUẤT UI ======
+    function renderHeader() {
+      const tr = $("#theadRow");
+      tr.innerHTML = "";
+      state.columns.forEach(col => {
+        const th = document.createElement("th");
+        th.className = "th-hover whitespace-nowrap text-xs md:text-sm font-semibold px-3 md:px-4 py-3 border-b border-white/10 cursor-pointer select-none";
+        th.title = "Nhấn để sắp xếp";
+        th.dataset.key = col.key;
+        th.innerHTML = `<div class="flex items-center gap-2">
+            <span>${col.label || col.key}</span>
+            <span class="sortIcon opacity-60"></span>
+          </div>`;
+        th.addEventListener('click', () => toggleSort(col.key));
+        tr.appendChild(th);
+      });
+      updateSortIcons();
+    }
+
+    function toggleSort(key) {
+      if (state.sort.key === key) state.sort.dir *= -1; else { state.sort.key = key; state.sort.dir = 1; }
+      state.page = 1;
+      update();
+    }
+
+    function updateSortIcons() {
+      $$("th .sortIcon").forEach(el => el.innerHTML = "");
+      const th = $(`th[data-key="${state.sort.key}"] .sortIcon`);
+      if (!th) return;
+      th.innerHTML = state.sort.dir === 1
+        ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4"><path d="M11 5h2v11h3l-4 4-4-4h3z"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4"><path d="M13 19h-2V8H8l4-4 4 4h-3z"/></svg>';
+    }
+
+    function getFilteredSortedRows() {
+      const q = state.filterText.trim().toLowerCase();
+      let rows = state.allRows;
+      if (q) {
+        rows = rows.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(q)));
+      }
+      if (state.sort.key) {
+        const { key, dir } = state.sort;
+        rows = rows.slice().sort((a,b) => {
+          const av = a[key] ?? ""; const bv = b[key] ?? "";
+          // Thử parse số
+          const na = parseFloat(String(av).replace(/,/g, '')); const nb = parseFloat(String(bv).replace(/,/g, ''));
+          if (!Number.isNaN(na) && !Number.isNaN(nb)) return (na - nb) * dir;
+          return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' }) * dir;
+        });
+      }
+      return rows;
+    }
+
+    function renderBody() {
+      const tbody = $("#tbody");
+      tbody.innerHTML = "";
+
+      const rows = getFilteredSortedRows();
+      const total = rows.length;
+      const pageSize = state.pageSize;
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      state.page = Math.min(state.page, totalPages);
+      const start = (state.page - 1) * pageSize;
+      const pageRows = rows.slice(start, start + pageSize);
+
+      for (const r of pageRows) {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-white/5 transition";
+        for (const col of state.columns) {
+          const td = document.createElement("td");
+          td.className = "px-3 md:px-4 py-2 align-top text-sm text-slate-100/90";
+          const val = r[col.key] ?? "";
+          td.textContent = val;
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+
+      $("#pageInfo").textContent = `${state.page} / ${totalPages}`;
+      $("#prevPage").disabled = state.page <= 1;
+      $("#nextPage").disabled = state.page >= totalPages;
+      $("#statusText").textContent = `${total} dòng, ${state.columns.length} cột`;
+    }
+
+    function update() {
+      renderHeader();
+      renderBody();
+      updateSortIcons();
+    }
+
+    // ====== NẠP DỮ LIỆU ======
+    async function loadData() {
+      const url = gvizUrl(SHEET_ID, GID, QUERY);
+      $("#sheetLink").href = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${GID}`;
+      $("#statusText").textContent = "Đang tải dữ liệu...";
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const json = parseGVizJson(text);
+        const table = json.table;
+        const columns = table.cols.map((c, i) => ({ key: c.label?.trim() || `Cột ${i+1}` , label: c.label?.trim() || `Cột ${i+1}`}));
+
+        // Trường hợp tiêu đề trống, tự tạo key an toàn (A, B, C...)
+        const safeColumns = columns.map((c, i) => ({
+          key: c.key || String.fromCharCode(65 + i),
+          label: c.label || `Cột ${i+1}`
+        }));
+
+        const rows = table.rows.map(row => {
+          const obj = {};
+          safeColumns.forEach((col, idx) => {
+            obj[col.key] = formatCell(row.c[idx]);
+          });
+          return obj;
+        });
+
+        state.columns = safeColumns;
+        state.allRows = rows;
+        state.page = 1;
+        update();
+      } catch (err) {
+        console.error(err);
+        $("#statusText").textContent = `Lỗi tải dữ liệu: ${err.message}. Kiểm tra SHEET_ID/gid và quyền chia sẻ.`;
+      }
+    }
+
+    // ====== SỰ KIỆN UI ======
+    $("#btnRefresh").addEventListener('click', loadData);
+    $("#prevPage").addEventListener('click', () => { state.page = Math.max(1, state.page - 1); renderBody(); });
+    $("#nextPage").addEventListener('click', () => { state.page = state.page + 1; renderBody(); });
+    $("#pageSize").addEventListener('change', (e) => { state.pageSize = parseInt(e.target.value, 10) || 25; state.page = 1; renderBody(); });
+    $("#searchInput").addEventListener('input', (e) => { state.filterText = e.target.value; state.page = 1; renderBody(); });
+    $("#btnClear").addEventListener('click', () => { $("#searchInput").value = ""; state.filterText = ""; state.page = 1; renderBody(); });
+    $("#btnCopy").addEventListener('click', async () => {
+      const rows = getFilteredSortedRows();
+      const header = state.columns.map(c => c.label).join("\t");
+      const body = rows.map(r => state.columns.map(c => r[c.key]).join("\t")).join("\n");
+      const tsv = header + "\n" + body;
+      try {
+        await navigator.clipboard.writeText(tsv);
+        toast("Đã sao chép vào clipboard (TSV)");
+      } catch (_) {
+        toast("Không thể sao chép. Trình duyệt chặn?", true);
+      }
+    });
+
+    // ====== TOAST NHO NHỎ ======
+    function toast(msg, error=false){
+      const t = document.createElement('div');
+      t.className = `fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-2xl shadow-2xl ${error? 'bg-rose-500' : 'bg-emerald-500'} text-white`;
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(()=> t.remove(), 2000);
+    }
+
+    // Khởi tạo
+    document.addEventListener('DOMContentLoaded', () => {
+      // Render icon
+      window.lucide?.createIcons();
+      loadData();
+    });
+  </script>
+</body>
+</html>
