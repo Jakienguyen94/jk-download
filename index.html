@@ -1,242 +1,374 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TỔNG HỢP LINK DOWLOAD PHẦN MỀM</title>
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tổng hợp phần mềm</title>
   <style>
-    body { 
-      background: radial-gradient(1200px 600px at 80% -10%, rgba(99,102,241,.15), transparent),
-                 radial-gradient(1000px 800px at -10% 10%, rgba(16,185,129,.12), transparent),
-                 #0b1220; 
+    :root{
+      --bg: #0b0b10;
+      --card: #12121a;
+      --muted: #8a8aa0;
+      --text: #e9e9ef;
+      --ring: #6b6bff;
+      --border: #232336;
+
+      /* button variables (overridden by theme) */
+      --btn-bg: linear-gradient(135deg,#7c3aed, #06b6d4);
+      --btn-bg-hover: linear-gradient(135deg,#6d28d9, #0891b2);
+      --btn-text: #ffffff;
+      --chip-bg: rgba(124,58,237,.15);
+      --chip-text: #c4b5fd;
+      --toggle-bg: rgba(124,58,237,.2);
+      --toggle-dot: #7c3aed;
     }
-    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.06); }
-    .scroll-shadow { box-shadow: inset 0 8px 8px -8px rgba(0,0,0,.4), inset 0 -8px 8px -8px rgba(0,0,0,.4);}    
-    .th-hover:hover { background: rgba(255,255,255,.06); }
+    /* SIMPLE (tím) theme overrides */
+    .theme-simple{
+      --btn-bg: #7c3aed;
+      --btn-bg-hover: #6d28d9;
+      --btn-text: #ffffff;
+      --chip-bg: rgba(124,58,237,.15);
+      --chip-text: #d6bcfa;
+      --toggle-bg: #2a2340;
+      --toggle-dot: #7c3aed;
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 70% -10%, #1e1e2a 0%, transparent 60%) , var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      line-height:1.45;
+    }
+    .container{
+      max-width:1000px; margin:40px auto; padding:0 16px;
+    }
+    .header{
+      display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .title{
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight:800; letter-spacing: .2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .title .dot{ width:10px; height:10px; border-radius:50%; background:var(--ring); box-shadow:0 0 16px var(--ring) }
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .control{
+      background: rgba(255,255,255,0.03);
+      border:1px solid var(--border);
+      border-radius:14px; padding:10px 12px;
+      display:flex; align-items:center; gap:10px; min-height:44px;
+    }
+    .control input[type="search"]{
+      background: transparent; color:var(--text);
+      border:none; outline:none; width:220px; font-size:14px;
+    }
+    .control select{
+      background: transparent; color:var(--text);
+      border:none; outline:none; font-size:14px;
+    }
+    .theme-toggle{
+      display:flex; gap:6px; background: rgba(255,255,255,0.04);
+      border:1px solid var(--border); padding:6px; border-radius:14px;
+    }
+    .toggle-btn{
+      cursor:pointer; user-select:none;
+      padding:8px 12px; border-radius:10px; font-weight:600; font-size:13px;
+      border:1px solid transparent;
+      background:var(--toggle-bg);
+      color:var(--text);
+      transition: transform .12s ease, background .2s ease, border-color .2s ease;
+    }
+    .toggle-btn.active{
+      border-color: var(--ring);
+      box-shadow: 0 0 0 2px rgba(107,107,255,.15) inset;
+      transform: translateY(-1px);
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+    }
+    table{
+      width:100%; border-collapse:separate; border-spacing:0;
+    }
+    thead th{
+      text-align:left; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--muted); padding:14px 16px; background:rgba(255,255,255,.02);
+      position: sticky; top:0; z-index:1; backdrop-filter: blur(6px);
+      border-bottom:1px solid var(--border);
+    }
+    tbody td{
+      padding:14px 16px; border-bottom:1px dashed rgba(255,255,255,.06);
+      vertical-align: middle;
+    }
+    tbody tr:hover{ background: rgba(255,255,255,.02) }
+    .col-stt{ width:72px }
+    .name{
+      font-weight:700; font-size:15px;
+    }
+    .tab-chip{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:12px; font-weight:700; letter-spacing:.02em;
+      background: var(--chip-bg); color: var(--chip-text);
+      padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.08);
+    }
+    .dl-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 14px; border-radius:12px; font-weight:800; letter-spacing:.2px;
+      text-decoration:none; border:0; outline:0; cursor:pointer;
+      background: var(--btn-bg); color: var(--btn-text);
+      box-shadow: 0 10px 20px rgba(124,58,237,.25);
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease, background .2s ease;
+    }
+    .dl-btn:hover{ transform: translateY(-1px); filter: saturate(1.05); box-shadow: 0 14px 28px rgba(124,58,237,.33); background: var(--btn-bg-hover) }
+    .dl-btn svg{ width:18px; height:18px }
+
+    .footer{
+      padding:14px 16px; color:var(--muted); font-size:12px; text-align:right;
+    }
+    .empty{
+      text-align:center; padding:36px; color:var(--muted)
+    }
+    .status{
+      font-size:12px; color:var(--muted); margin:10px 2px 0;
+    }
+
+    @media (max-width:700px){
+      .control input[type="search"]{ width:150px }
+      .name{ font-size:14px }
+    }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen">
-  <div class="max-w-7xl mx-auto p-4 md:p-8">
-    <!-- Header -->
-    <header class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl md:text-4xl font-bold tracking-tight">BẢNG TRA TỔNG HỢP PHẦN MỀM</h1>
-        <p class="text-slate-300 mt-1">Tra cứu tìm kiếm những phần mềm cần thiết.</p>
-      </div>
-      <div class="hidden md:flex gap-2">
-        <button id="btnRefresh" class="inline-flex items-center gap-2 rounded-2xl px-4 py-2 glass hover:bg-white/10 transition">
-          <i data-lucide="refresh-ccw" class="w-4 h-4"></i><span>Tải lại</span>
-        </button>
-        <a target="_blank" id="sheetLink" href="#" class="inline-flex items-center gap-2 rounded-2xl px-4 py-2 glass hover:bg-white/10 transition">
-          <i data-lucide="sheet" class="w-4 h-4"></i><span>Mở Sheet</span>
-        </a>
-      </div>
-    </header>
-
-    <!-- Controls -->
-    <section class="glass rounded-3xl p-4 md:p-6 shadow-xl mb-6">
-      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-        <div class="flex items-center gap-2 w-full md:w-auto">
-          <div class="relative flex-1 md:w-96">
-            <input id="searchInput" type="text" placeholder="Tìm theo từ khóa..." class="w-full rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 px-4 py-2 pr-10 placeholder:text-slate-400"/>
-            <i data-lucide="search" class="w-4 h-4 absolute right-3 top-2.5 opacity-60"></i>
-          </div>
-          <button id="btnClear" class="rounded-2xl px-3 py-2 glass hover:bg-white/10" title="Xóa tìm kiếm">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+<body class="theme-gradient">
+  <div class="container">
+    <div class="header">
+      <div class="title"><span class="dot"></span> Tổng hợp phần mềm</div>
+      <div class="toolbar">
+        <div class="theme-toggle" role="group" aria-label="Đổi chủ đề">
+          <button class="toggle-btn active" data-theme="gradient" title="Gradient">Gradient</button>
+          <button class="toggle-btn" data-theme="simple" title="Simple tím">Simple</button>
         </div>
-
-        <div class="flex items-center gap-3">
-          <label class="text-sm text-slate-300">Hàng/trang</label>
-          <select id="pageSize" class="rounded-2xl bg-white/5 border border-white/10 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400/50">
-            <option>10</option>
-            <option selected>25</option>
-            <option>50</option>
-            <option>100</option>
+        <div class="control" title="Tìm kiếm theo tên hoặc tab">
+          🔎
+          <input id="search" type="search" placeholder="Tìm theo tên, tab..." />
+        </div>
+        <div class="control" title="Sắp xếp theo tên">
+          ↕️
+          <select id="sort">
+            <option value="name-asc">Tên (A → Z)</option>
+            <option value="name-desc">Tên (Z → A)</option>
           </select>
-          <button id="btnCopy" class="rounded-2xl px-3 py-2 glass hover:bg-white/10" title="Sao chép dữ liệu hiển thị">
-            <i data-lucide="clipboard" class="w-4 h-4"></i>
-          </button>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Table -->
-    <section class="glass rounded-3xl shadow-2xl overflow-hidden">
-      <div class="overflow-auto scroll-shadow max-h-[70vh]" id="tableViewport">
-        <table id="dataTable" class="w-full text-left align-middle">
-          <thead class="sticky top-0 bg-white/5 backdrop-blur z-10">
-            <tr id="theadRow" class="text-slate-200 text-sm"></tr>
-          </thead>
-          <tbody id="tbody" class="divide-y divide-white/5"></tbody>
-        </table>
-      </div>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-white/10 bg-white/5">
-        <div id="statusText" class="text-sm text-slate-300">Đang tải...</div>
-        <div class="flex items-center gap-2">
-          <button id="prevPage" class="rounded-xl px-3 py-2 glass hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-          <span id="pageInfo" class="text-sm tabular-nums">1 / 1</span>
-          <button id="nextPage" class="rounded-xl px-3 py-2 glass hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-        </div>
-      </div>
-    </section>
+    <div class="status" id="status">Đang tải dữ liệu từ Google Sheet...</div>
+
+    <div class="card" role="region" aria-label="Bảng phần mềm">
+      <table id="table">
+        <thead>
+          <tr>
+            <th class="col-stt">STT</th>
+            <th>Tên phần mềm</th>
+            <th>Tab</th>
+            <th>Link tải xuống</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="4" class="empty">Đang tải...</td></tr>
+        </tbody>
+      </table>
+      <div class="footer" id="footer">—</div>
+    </div>
   </div>
 
   <script>
-    const SHEET_ID = "15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g"; 
-    const GID = "0"; 
-    const QUERY = ""; 
+    // === CONFIG ===
+    // 1) Lấy SHEET_ID từ URL dạng:
+    //    https://docs.google.com/spreadsheets/d/<SHEET_ID>/edit#gid=...
+    // 2) SHEET_NAME là tên sheet (ví dụ: Sheet1). Nếu không chắc, dùng gid:
+    //    thêm tham số &gid=<GID> thay vì sheet=<SHEET_NAME>
+    const SHEET_ID   = "YOUR_SHEET_ID_HERE";
+    const SHEET_NAME = "Sheet1"; // đổi nếu cần
+    // Nếu muốn dùng gid thay cho sheet name, set SHEET_GID và đổi URL ở buildGvizUrl()
+    const SHEET_GID  = ""; // ví dụ "0" (để trống nếu không dùng)
 
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    // === STATE ===
+    let rawRows = [];   // dữ liệu gốc từ sheet
+    let viewRows = [];  // dữ liệu sau khi lọc + sắp xếp
+    let currentTheme = "gradient";
 
-    function gvizUrl(sheetId, gid, query="") {
-      const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq`;
-      const params = new URLSearchParams({ tqx: "out:json", gid });
-      if (query) params.set("tq", query);
-      return `${base}?${params.toString()}`;
-    }
-    function parseGVizJson(text) {
-      const start = text.indexOf("(");
-      const end = text.lastIndexOf(")");
-      return JSON.parse(text.slice(start+1, end));
-    }
-    function formatCell(c) {
-      if (!c) return "";
-      if (c.f != null) return c.f;
-      if (c.v == null) return "";
-      if (typeof c.v === 'object') return JSON.stringify(c.v);
-      return String(c.v);
-    }
-
-    const state = { allRows: [], columns: [], sort: { key: null, dir: 1 }, filterText: "", page: 1, pageSize: 25 };
-
-    function renderHeader() {
-      const tr = $("#theadRow"); tr.innerHTML = "";
-      state.columns.forEach(col => {
-        const th = document.createElement("th");
-        th.className = "th-hover whitespace-nowrap text-xs md:text-sm font-semibold px-3 md:px-4 py-3 border-b border-white/10 cursor-pointer select-none";
-        th.dataset.key = col.key;
-        th.innerHTML = `<div class="flex items-center gap-2"><span>${col.label || col.key}</span><span class="sortIcon opacity-60"></span></div>`;
-        th.addEventListener('click', () => toggleSort(col.key));
-        tr.appendChild(th);
+    // === THEME TOGGLE ===
+    const themeButtons = document.querySelectorAll('.toggle-btn');
+    themeButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        themeButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const theme = btn.dataset.theme;
+        setTheme(theme);
       });
-      updateSortIcons();
-    }
-    function toggleSort(key) {
-      if (state.sort.key === key) state.sort.dir *= -1; else { state.sort.key = key; state.sort.dir = 1; }
-      state.page = 1; update();
-    }
-    function updateSortIcons() {
-      $$("th .sortIcon").forEach(el => el.innerHTML = "");
-      const th = $(`th[data-key="${state.sort.key}"] .sortIcon`);
-      if (!th) return;
-      th.innerHTML = state.sort.dir === 1
-        ? '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24"><path d="M11 5h2v11h3l-4 4-4-4h3z"/></svg>'
-        : '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24"><path d="M13 19h-2V8H8l4-4 4 4h-3z"/></svg>';
-    }
-    function getFilteredSortedRows() {
-      const q = state.filterText.trim().toLowerCase();
-      let rows = state.allRows;
-      if (q) rows = rows.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(q)));
-      if (state.sort.key) {
-        const { key, dir } = state.sort;
-        rows = rows.slice().sort((a,b) => {
-          const av = a[key] ?? ""; const bv = b[key] ?? "";
-          const na = parseFloat(String(av).replace(/,/g, '')); const nb = parseFloat(String(bv).replace(/,/g, ''));
-          if (!Number.isNaN(na) && !Number.isNaN(nb)) return (na - nb) * dir;
-          return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' }) * dir;
-        });
+    });
+    function setTheme(theme){
+      currentTheme = theme;
+      if(theme === 'simple'){
+        document.body.classList.add('theme-simple');
+      }else{
+        document.body.classList.remove('theme-simple');
       }
-      return rows;
+      document.body.classList.toggle('theme-gradient', theme==='gradient');
     }
 
-    function renderBody() {
-      const tbody = $("#tbody"); tbody.innerHTML = "";
-      const rows = getFilteredSortedRows(); const total = rows.length; const pageSize = state.pageSize;
-      const totalPages = Math.max(1, Math.ceil(total / pageSize));
-      state.page = Math.min(state.page, totalPages);
-      const start = (state.page - 1) * pageSize;
-      const pageRows = rows.slice(start, start + pageSize);
+    // === GVIZ FETCH ===
+    function buildGvizUrl(){
+      const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq`;
+      if(SHEET_GID && SHEET_GID.trim()!==""){
+        return `${base}?gid=${encodeURIComponent(SHEET_GID)}&tqx=out:json`;
+      }
+      return `${base}?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json`;
+    }
 
-      for (const r of pageRows) {
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-white/5 transition";
-        for (const col of state.columns) {
-          const td = document.createElement("td");
-          td.className = "px-3 md:px-4 py-2 align-top text-sm text-slate-100/90";
-          const val = r[col.key] ?? "";
+    async function fetchSheet(){
+      const status = document.getElementById('status');
+      try{
+        const url = buildGvizUrl();
+        const res = await fetch(url);
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        // Strip Google Visualization JSONP wrapper
+        const jsonStr = text.replace(/^.*setResponse\(|\);\s*$/g, '');
+        const data = JSON.parse(jsonStr);
+        // Expect columns: STT | Tên phần mềm | Tab | Link tải xuống
+        const rows = (data.table.rows || []).map(r=>{
+          const c = r.c || [];
+          return {
+            stt:        c[0]?.v ?? "",
+            name:       c[1]?.v?.toString() ?? "",
+            tab:        c[2]?.v?.toString() ?? "",
+            download:   c[3]?.v?.toString() ?? ""
+          };
+        }).filter(x => x.name || x.tab || x.download);
 
-          if (/https?:\/\//.test(val)) {
-            td.innerHTML = `
-              <a href="${val}" target="_blank"
-                 class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm transition">
-                <i data-lucide="download" class="w-4 h-4"></i> Download
-              </a>
-            `;
-          } else {
-            td.textContent = val;
-          }
-          tr.appendChild(td);
+        if(rows.length === 0){
+          status.textContent = "Không có dữ liệu (kiểm tra cột & quyền chia sẻ Sheet).";
+        }else{
+          status.textContent = `Đã tải ${rows.length} mục.`;
         }
-        tbody.appendChild(tr);
-      }
-
-      $("#pageInfo").textContent = `${state.page} / ${totalPages}`;
-      $("#prevPage").disabled = state.page <= 1;
-      $("#nextPage").disabled = state.page >= totalPages;
-      $("#statusText").textContent = `${total} dòng, ${state.columns.length} cột`;
-
-      window.lucide?.createIcons();
-    }
-    function update() { renderHeader(); renderBody(); updateSortIcons(); }
-
-    async function loadData() {
-      const url = gvizUrl(15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g, GID, QUERY);
-      $("#sheetLink").href = `https://docs.google.com/spreadsheets/d/${15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g}/edit#gid=${0}`;
-      $("#statusText").textContent = "Đang tải dữ liệu...";
-      try {
-        const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text(); const json = parseGVizJson(text); const table = json.table;
-        const columns = table.cols.map((c, i) => ({ key: c.label?.trim() || `Cột ${i+1}`, label: c.label?.trim() || `Cột ${i+1}` }));
-        const safeColumns = columns.map((c, i) => ({ key: c.key || String.fromCharCode(65 + i), label: c.label || `Cột ${i+1}` }));
-        const rows = table.rows.map(row => {
-          const obj = {}; safeColumns.forEach((col, idx) => { obj[col.key] = formatCell(row.c[idx]); });
-          return obj;
-        });
-        state.columns = safeColumns; state.allRows = rows; state.page = 1; update();
-      } catch (err) {
+        rawRows = rows;
+        applyFiltersAndRender();
+      }catch(err){
         console.error(err);
-        $("#statusText").textContent = `Lỗi tải dữ liệu: ${err.message}.`;
+        status.textContent = "Không tải được dữ liệu từ Google Sheet. Hiển thị dữ liệu mẫu.";
+        // Fallback sample
+        rawRows = [
+          { stt: 1, name: "Tool ABC", tab: "Tiện ích", download: "https://example.com/abc.zip" },
+          { stt: 2, name: "App XYZ", tab: "Hệ thống", download: "https://example.com/xyz.exe" },
+          { stt: 3, name: "Driver 123", tab: "Driver",  download: "https://example.com/driver123.msi" },
+        ];
+        applyFiltersAndRender();
       }
     }
 
-    $("#btnRefresh").addEventListener('click', loadData);
-    $("#prevPage").addEventListener('click', () => { state.page = Math.max(1, state.page - 1); renderBody(); });
-    $("#nextPage").addEventListener('click', () => { state.page = state.page + 1; renderBody(); });
-    $("#pageSize").addEventListener('change', e => { state.pageSize = parseInt(e.target.value, 10) || 25; state.page = 1; renderBody(); });
-    $("#searchInput").addEventListener('input', e => { state.filterText = e.target.value; state.page = 1; renderBody(); });
-    $("#btnClear").addEventListener('click', () => { $("#searchInput").value = ""; state.filterText = ""; state.page = 1; renderBody(); });
-    $("#btnCopy").addEventListener('click', async () => {
-      const rows = getFilteredSortedRows();
-      const header = state.columns.map(c => c.label).join("\t");
-      const body = rows.map(r => state.columns.map(c => r[c.key]).join("\t")).join("\n");
-      const tsv = header + "\n" + body;
-      try { await navigator.clipboard.writeText(tsv); toast("Đã sao chép vào clipboard (TSV)"); }
-      catch { toast("Không thể sao chép", true); }
+    // === SEARCH + SORT ===
+    const searchEl = document.getElementById('search');
+    const sortEl = document.getElementById('sort');
+
+    let searchTerm = "";
+    searchEl.addEventListener('input', debounce(()=>{
+      searchTerm = (searchEl.value || "").toLowerCase().trim();
+      applyFiltersAndRender();
+    }, 120));
+
+    sortEl.addEventListener('change', ()=>{
+      applyFiltersAndRender();
     });
 
-    function toast(msg, error=false){
-      const t = document.createElement('div');
-      t.className = `fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-2xl shadow-2xl ${error? 'bg-rose-500' : 'bg-emerald-500'} text-white`;
-      t.textContent = msg; document.body.appendChild(t); setTimeout(()=> t.remove(), 2000);
+    function applyFiltersAndRender(){
+      const sortMode = sortEl.value;
+      viewRows = rawRows.filter(r=>{
+        if(!searchTerm) return true;
+        const pool = `${r.name} ${r.tab}`.toLowerCase();
+        return pool.includes(searchTerm);
+      });
+
+      viewRows.sort((a,b)=>{
+        const A = (a.name||"").toLowerCase();
+        const B = (b.name||"").toLowerCase();
+        if(sortMode === 'name-asc')  return A.localeCompare(B, 'vi');
+        if(sortMode === 'name-desc') return B.localeCompare(A, 'vi');
+        return 0;
+      });
+
+      renderTable(viewRows);
     }
 
-    document.addEventListener('DOMContentLoaded', () => { window.lucide?.createIcons(); loadData(); });
+    // === RENDER ===
+    function renderTable(rows){
+      const tbody = document.getElementById('tbody');
+      const footer = document.getElementById('footer');
+
+      if(!rows.length){
+        tbody.innerHTML = `<tr><td colspan="4" class="empty">Không có kết quả phù hợp.</td></tr>`;
+        footer.textContent = "—";
+        return;
+      }
+
+      const html = rows.map(r=>{
+        const safeName = escapeHtml(r.name ?? "");
+        const safeTab  = escapeHtml(r.tab ?? "");
+        const stt = r.stt ?? "";
+        const link = (r.download ?? "").trim();
+        const btn = link
+          ? `<a class="dl-btn" href="${encodeURIComponentLink(link)}" target="_blank" rel="noopener">
+               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                 <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+               </svg>
+               Download
+             </a>`
+          : `<span style="color:var(--muted)">—</span>`;
+
+        return `
+          <tr>
+            <td class="col-stt">${stt}</td>
+            <td class="name">${safeName}</td>
+            <td><span class="tab-chip">#${safeTab}</span></td>
+            <td>${btn}</td>
+          </tr>
+        `;
+      }).join('');
+
+      tbody.innerHTML = html;
+      footer.textContent = `Hiển thị ${rows.length} mục`;
+    }
+
+    // === UTIL ===
+    function escapeHtml(str){
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+    function encodeURIComponentLink(url){
+      // giữ nguyên scheme và query, chỉ encode phần nguy hiểm cơ bản
+      try{
+        const u = new URL(url);
+        return u.toString();
+      }catch{
+        // nếu là đường dẫn thô (không hợp lệ URL), vẫn trả về (tránh phá link nội bộ)
+        return url.replace(/"/g, '%22').replace(/ /g, '%20');
+      }
+    }
+    function debounce(fn, delay){
+      let t; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), delay); };
+    }
+
+    // Kickoff
+    fetchSheet();
   </script>
 </body>
 </html>
