@@ -33,9 +33,7 @@
       transform: translateY(10px);
       opacity: 0;
     }
-    @keyframes fadeUp {
-      to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes fadeUp { to { transform: translateY(0); opacity: 1; } }
     .card h2 { font-size: 16px; margin: 0 0 5px; }
     .card p { font-size: 13px; margin: 0 0 10px; }
     .btn {
@@ -49,15 +47,53 @@
       transition: 0.3s;
     }
     .btn:hover { transform: scale(1.05); }
+
+    /* Overlay đếm ngược */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg,#89f7fe,#66a6ff);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-align: center;
+      z-index: 999;
+      display: none;
+    }
+    #overlay h2 { font-size: 20px; margin-bottom: 10px; }
+    #overlay p { font-size: 14px; margin: 5px 0; }
+    .count { font-size: 28px; font-weight: bold; margin: 15px 0; }
+    .btn2 {
+      padding: 10px 20px;
+      background: linear-gradient(45deg,#ff9966,#ff5e62);
+      border: none;
+      border-radius: 25px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.9;
+    }
+    .btn2:hover { opacity: 1; }
   </style>
 </head>
 <body>
   <h1>📂 Danh sách tải xuống</h1>
   <div id="download-list"></div>
 
+  <!-- Overlay -->
+  <div id="overlay">
+    <h2 id="fileTitle">Chuẩn bị tải xuống...</h2>
+    <p>Vui lòng chờ <span class="count" id="count">5</span> giây</p>
+    <a id="directLink" class="btn2" style="display:none;">Tải ngay</a>
+  </div>
+
   <script>
     const SHEET_URL = "LINK_CSV_CUA_BAN"; // Thay bằng link CSV Google Sheet
 
+    // Load danh sách
     fetch(SHEET_URL)
     .then(res => res.text())
     .then(csv => {
@@ -70,14 +106,36 @@
           <div class="card" style="animation-delay:${0.1*i}s">
             <h2>${title}</h2>
             <p>${desc || ""}</p>
-            <a href="download.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(title)}">
-              <button class="btn">⬇️ Tải xuống</button>
-            </a>
+            <button class="btn" onclick="startDownload('${title}','${link}')">⬇️ Tải xuống</button>
           </div>
         `;
       });
       document.getElementById("download-list").innerHTML = html;
     });
+
+    // Xử lý overlay đếm ngược
+    function startDownload(title, link){
+      document.getElementById("overlay").style.display = "flex";
+      document.getElementById("fileTitle").innerText = "📦 " + title;
+      const counter = document.getElementById("count");
+      const linkBtn = document.getElementById("directLink");
+      linkBtn.href = link;
+
+      let count = 5;
+      counter.innerText = count;
+      linkBtn.style.display = "none";
+
+      let timer = setInterval(()=>{
+        count--;
+        counter.innerText = count;
+        if(count <= 0){
+          clearInterval(timer);
+          counter.innerText = "0";
+          linkBtn.style.display = "inline-block";
+          window.location.href = link; // tự động tải
+        }
+      },1000);
+    }
   </script>
 </body>
 </html>
