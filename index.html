@@ -196,8 +196,8 @@
     function update() { renderHeader(); renderBody(); updateSortIcons(); }
 
     async function loadData() {
-      const url = gvizUrl(SHEET_ID, GID, QUERY);
-      $("#sheetLink").href = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${GID}`;
+      const url = gvizUrl(15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g, GID, QUERY);
+      $("#sheetLink").href = `https://docs.google.com/spreadsheets/d/${15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g}/edit#gid=${0}`;
       $("#statusText").textContent = "Đang tải dữ liệu...";
       try {
         const res = await fetch(url); if (!res.ok) throw new Error(`HTTP ${res.status}`);
