@@ -6,79 +6,53 @@
   <title>Download Center</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, #fdfbfb, #ebedee);
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
       margin: 0;
-      padding: 30px 15px;
+      padding: 20px;
+      color: #333;
     }
-
     h1 {
       text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 22px;
+      margin-bottom: 20px;
     }
-
     #download-list {
       display: grid;
-      gap: 25px;
-      max-width: 800px;
+      gap: 15px;
+      max-width: 600px;
       margin: auto;
     }
-
     .card {
-      padding: 25px;
-      border-radius: 20px;
-      background: linear-gradient(135deg,#89f7fe,#66a6ff);
+      padding: 15px;
+      border-radius: 12px;
+      background: linear-gradient(135deg,#74ebd5,#9face6);
       color: #fff;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      transform: translateY(20px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      animation: fadeUp 0.5s ease forwards;
+      transform: translateY(10px);
       opacity: 0;
-      animation: fadeUp 0.6s forwards;
     }
-
-    .card:nth-child(1) { animation-delay: 0.2s; }
-    .card:nth-child(2) { animation-delay: 0.4s; }
-    .card:nth-child(3) { animation-delay: 0.6s; }
-
     @keyframes fadeUp {
       to { transform: translateY(0); opacity: 1; }
     }
-
-    .card h2 {
-      margin: 0 0 10px;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .card p {
-      margin: 0 0 20px;
-      font-size: 15px;
-      opacity: 0.95;
-    }
-
+    .card h2 { font-size: 16px; margin: 0 0 5px; }
+    .card p { font-size: 13px; margin: 0 0 10px; }
     .btn {
-      padding: 12px 28px;
+      padding: 8px 18px;
       background: linear-gradient(45deg,#ff9966,#ff5e62);
       border: none;
-      border-radius: 50px;
+      border-radius: 20px;
       color: #fff;
-      font-weight: bold;
-      font-size: 15px;
+      font-size: 13px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: 0.3s;
     }
-
-    .btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-    }
+    .btn:hover { transform: scale(1.05); }
   </style>
 </head>
 <body>
-  <h1>📂 Download Center</h1>
+  <h1>📂 Danh sách tải xuống</h1>
   <div id="download-list"></div>
 
   <script>
@@ -93,10 +67,10 @@
         let [title, desc, link] = r.split(",");
         if(!title || !link) return;
         html += `
-          <div class="card" style="animation-delay:${0.2*i}s">
+          <div class="card" style="animation-delay:${0.1*i}s">
             <h2>${title}</h2>
             <p>${desc || ""}</p>
-            <a href="${link}" target="_blank">
+            <a href="download.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(title)}">
               <button class="btn">⬇️ Tải xuống</button>
             </a>
           </div>
