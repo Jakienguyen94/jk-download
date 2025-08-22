@@ -111,22 +111,37 @@
   </div>
 
   <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g/edit?usp=sharing"; // Thay bằng link CSV Google Sheet
+    const SHEET_URL = "LINK_CSV_CUA_BAN"; // <-- thay link CSV xuất từ Google Sheet
+
+    // Hàm parse CSV an toàn
+    function parseCSVLine(line) {
+      // Tách CSV chuẩn, vẫn giữ text trong ""
+      const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
+      let result = [];
+      let match;
+      while ((match = regex.exec(line)) !== null) {
+        result.push(match[0].replace(/^"|"$/g, "")); // bỏ dấu "
+      }
+      return result;
+    }
 
     // Load danh sách
     fetch(SHEET_URL)
     .then(res => res.text())
     .then(csv => {
-      let rows = csv.split("\n").slice(1);
+      let rows = csv.trim().split("\n").slice(1); // bỏ dòng header
       let html = "";
       rows.forEach((r,i) => {
-        let [title, desc, link, icon] = r.split(",");
+        let [title, desc, link, icon] = parseCSVLine(r);
         if(!title || !link) return;
 
-        // Nếu có icon FA thì thêm, không thì mặc định 💻
-        let iconHTML = icon && icon.trim() 
-          ? `<i class="${icon.trim()}"></i>` 
+        // Icon FontAwesome hoặc fallback
+        let iconHTML = (icon && icon.trim())
+          ? `<i class="${icon.trim()}"></i>`
           : "💻";
+
+        // Encode link để an toàn khi gắn vào onclick
+        let safeLink = encodeURIComponent(link);
 
         html += `
           <div class="card" style="animation-delay:${0.1*i}s">
@@ -135,7 +150,7 @@
               <h2>${title}</h2>
               <p>${desc || ""}</p>
             </div>
-            <button class="btn" onclick="startDownload('${title}','${link}')">⬇️</button>
+            <button class="btn" onclick="startDownload('${title.replace(/'/g,"\\'")}', decodeURIComponent('${safeLink}'))">⬇️</button>
           </div>
         `;
       });
