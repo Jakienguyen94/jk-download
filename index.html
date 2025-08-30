@@ -54,35 +54,49 @@
       outline: none;
     }
 
-    /* 🔑 Card mật khẩu */
-    .password-card {
-      margin-top: 16px;
-      background: linear-gradient(135deg,#141E30,#243B55);
-      color: #fff;
-      padding: 16px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      text-align: center;
-      animation: glow 2s infinite alternate;
+    /* 📜 List mật khẩu */
+    .password-list {
+      margin-top: 12px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    .password-card h4 {
-      margin: 0 0 10px;
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .password-card p {
-      margin: 0;
+    .password-list h4 {
+      margin: 0 0 8px;
       font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      background: rgba(255,255,255,0.1);
+      font-weight: 700;
+      color: #333;
+    }
+    .password-list ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 160px; /* giới hạn chiều cao */
+      overflow-y: auto;
+    }
+    .password-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f7f7f7;
+      margin-bottom: 6px;
       padding: 6px 10px;
       border-radius: 8px;
-      display: inline-block;
+      font-size: 14px;
     }
-    @keyframes glow {
-      from { box-shadow: 0 0 10px #00f, 0 0 20px #0ff; }
-      to   { box-shadow: 0 0 20px #ff00ff, 0 0 30px #f0f; }
+    .password-list button {
+      background: linear-gradient(135deg,#00c6ff,#0072ff);
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .password-list button:hover {
+      transform: scale(1.1);
     }
 
     .main { flex: 1; }
@@ -203,10 +217,10 @@
         <option value="100">100 dòng / trang</option>
       </select>
 
-      <!-- 🔑 Mật khẩu -->
-      <div class="password-card">
-        <h4>🔑 Mật khẩu</h4>
-        <p id="globalPass">Đang tải...</p>
+      <!-- 📜 Danh sách mật khẩu -->
+      <div class="password-list">
+        <h4>📜 Danh sách mật khẩu</h4>
+        <ul id="passwordList"></ul>
       </div>
     </div>
 
@@ -249,8 +263,18 @@
       loadTabFilter();
       renderTable();
 
-      // 🔑 Lấy mật khẩu từ cột "Mật khẩu" (giả sử dùng mật khẩu ở hàng đầu tiên)
-      document.getElementById("globalPass").textContent = data[0]?.["Mật khẩu"] || "Không có";
+      // 📜 Danh sách mật khẩu (lọc trùng, bỏ rỗng)
+      const passwords = [...new Set(data.map(item => item["Mật khẩu"]).filter(p => p && p.trim() !== ""))];
+      const passwordList = document.getElementById("passwordList");
+      passwordList.innerHTML = "";
+      passwords.forEach(pass => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span>${pass}</span>
+          <button onclick="copyPassword('${pass}')">📋 Copy</button>
+        `;
+        passwordList.appendChild(li);
+      });
     }
 
     function loadTabFilter() {
@@ -334,6 +358,12 @@
       const subject = encodeURIComponent("Báo link hỏng: " + name);
       const body = encodeURIComponent(`Xin chào,\n\nLink tải phần mềm "${name}" đã bị hỏng.\nLink: ${link}\n\nNhờ admin kiểm tra lại.`);
       window.location.href = `mailto:nhan.vhit94@gmail.com?subject=${subject}&body=${body}`;
+    }
+
+    function copyPassword(pass) {
+      navigator.clipboard.writeText(pass).then(() => {
+        alert("✅ Đã copy: " + pass);
+      });
     }
 
     fetchData();
