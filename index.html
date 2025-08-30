@@ -6,145 +6,191 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, #6a85b6, #bac8e0, #d6a4a4);
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
       margin: 0;
-      padding: 20px;
+      padding: 30px;
       color: #333;
     }
+
     .container {
-      max-width: 1100px;
+      max-width: 1250px;
       margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 20px;
+      background: rgba(255,255,255,0.95);
+      padding: 25px;
+      border-radius: 22px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+      backdrop-filter: blur(10px);
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: 600;
+
+    .sidebar {
+      flex: 0 0 250px;
+      background: #fafafa;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: fit-content;
+    }
+    .sidebar h3 {
+      margin-top: 0;
+      font-size: 18px;
+      font-weight: 700;
       color: #444;
     }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    input, select, button {
-      padding: 6px 10px;
-      border-radius: 8px;
+    .sidebar input, .sidebar select {
+      padding: 10px 12px;
+      border-radius: 12px;
       border: 1px solid #ccc;
       font-size: 14px;
+      transition: all 0.3s;
     }
+    .sidebar input:focus, .sidebar select:focus {
+      border-color: #2575fc;
+      box-shadow: 0 0 6px rgba(37,117,252,0.5);
+      outline: none;
+    }
+
+    .main {
+      flex: 1;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 18px;
+      font-weight: 800;
+      font-size: 26px;
+      color: #2c2c54;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    thead {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
     }
     th, td {
       text-align: left;
-      padding: 8px 10px;
-      border-bottom: 1px solid #eee;
-      white-space: nowrap;
+      padding: 10px 12px;
     }
+    tbody tr:nth-child(even) {background: #fafafa;}
+    tbody tr:hover {background: #f0f0ff;}
     th {
-      cursor: pointer;
-      background: #f8f8f8;
       font-weight: 600;
     }
-    .btn-download {
-      display: inline-block;
-      padding: 8px 14px;
+
+    .btn-download, .btn-report {
+      padding: 6px 14px;
       font-size: 13px;
-      font-weight: 500;
-      color: #fff;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      font-weight: 600;
       border: none;
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.3s;
+      color: #fff;
+    }
+    .btn-download {
+      background: linear-gradient(135deg, #ff9966, #ff5e62);
     }
     .btn-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: scale(1.05);
     }
+    .btn-report {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    }
+    .btn-report:hover {
+      transform: scale(1.05);
+    }
+
     .rainbow-text {
       font-weight: bold;
       background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .pagination {
       display: flex;
       justify-content: center;
-      align-items: center;
-      margin-top: 15px;
-      gap: 10px;
-      font-size: 14px;
+      margin-top: 18px;
+      gap: 8px;
     }
     .pagination button {
-      padding: 5px 10px;
+      padding: 6px 12px;
       border: none;
+      border-radius: 8px;
       background: #eee;
-      border-radius: 6px;
       cursor: pointer;
     }
     .pagination button.active {
-      background: #6a11cb;
+      background: #2575fc;
       color: #fff;
     }
-    /* Popup */
+
     .popup {
       display: none;
       position: fixed;
       top: 0; left: 0; right:0; bottom:0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
       z-index: 999;
     }
     .popup-content {
       background: #fff;
-      padding: 20px 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-      font-size: 15px;
-      color: #333;
+      padding: 20px 35px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      font-size: 16px;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>🍨TỔNG HỢP PHẦN MỀM - JAKIE NGUYỄN 2025</h2>
-    <div class="controls">
-      <input type="text" id="search" placeholder="Tìm kiếm...">
+    <!-- Bên trái -->
+    <div class="sidebar">
+      <h3>🔎 Tìm kiếm & Lọc</h3>
+      <input type="text" id="search" placeholder="Nhập tên phần mềm...">
       <select id="tabFilter"><option value="">-- Lọc theo Tab --</option></select>
       <select id="rowsPerPage">
-        <option value="20">20</option>
-        <option value="40">40</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
+        <option value="20">20 dòng / trang</option>
+        <option value="40">40 dòng / trang</option>
+        <option value="50">50 dòng / trang</option>
+        <option value="100">100 dòng / trang</option>
       </select>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>STT</th>
-          <th>Tên phần mềm</th>
-          <th>Tab</th>
-          <th>Upload</th>
-          <th>Download</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-    <div class="pagination" id="pagination"></div>
+
+    <!-- Bên phải -->
+    <div class="main">
+      <h2>🍨 TỔNG HỢP PHẦN MỀM - JAKIE NGUYỄN 2025</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên phần mềm</th>
+            <th>Tab</th>
+            <th>Upload</th>
+            <th>Download</th>
+            <th>Báo hỏng</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="pagination" id="pagination"></div>
+    </div>
   </div>
 
   <div class="popup" id="popup">
-    <div class="popup-content">Đang chuyển trang...</div>
+    <div class="popup-content">⏳ Đang chuyển trang tải xuống...</div>
   </div>
 
   <script>
@@ -187,7 +233,8 @@
           <td>${row["Tên phần mềm"]}</td>
           <td>${row.Tab}</td>
           <td class="rainbow-text">${row.Upload || ""}</td>
-          <td><button class="btn-download" onclick="showPopup('${row['Link tải xuống']}')">Download</button></td>
+          <td><button class="btn-download" onclick="showPopup('${row['Link tải xuống']}')">⬇️ Download</button></td>
+          <td><button class="btn-report" onclick="reportLink('${row["Tên phần mềm"]}', '${row['Link tải xuống']}')">🚨 Báo hỏng</button></td>
         `;
         tableBody.appendChild(tr);
       });
@@ -236,7 +283,13 @@
       setTimeout(() => {
         popup.style.display = "none";
         window.open(link, "_blank");
-      }, 1500);
+      }, 1200);
+    }
+
+    function reportLink(name, link) {
+      const subject = encodeURIComponent("Báo link hỏng: " + name);
+      const body = encodeURIComponent(`Xin chào,\n\nLink tải phần mềm "${name}" đã bị hỏng.\nLink: ${link}\n\nNhờ admin kiểm tra lại.`);
+      window.location.href = `mailto:nhan.vhit94@gmail.com?subject=${subject}&body=${body}`;
     }
 
     fetchData();
