@@ -72,7 +72,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 160px; /* giới hạn chiều cao */
+      max-height: 160px;
       overflow-y: auto;
     }
     .password-list li {
@@ -97,6 +97,30 @@
     }
     .password-list button:hover {
       transform: scale(1.1);
+    }
+
+    /* 🌍 Box hiển thị IP */
+    .ip-info {
+      margin-top: 12px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .ip-info h4 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+    }
+    .ip-map {
+      width: 100%;
+      height: 180px;
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
     }
 
     .main { flex: 1; }
@@ -128,7 +152,6 @@
     tbody tr:hover {background: #f0f0ff;}
     th { font-weight: 600; }
 
-    /* 🎨 Button download đẹp */
     .btn-download, .btn-report {
       padding: 8px 16px;
       font-size: 13px;
@@ -221,6 +244,13 @@
       <div class="password-list">
         <h4>📜 Danh sách mật khẩu</h4>
         <ul id="passwordList"></ul>
+      </div>
+
+      <!-- 🌍 Hiển thị IP & Vị trí -->
+      <div class="ip-info">
+        <h4>🌍 Thông tin IP</h4>
+        <div id="ipBox">⏳ Đang lấy dữ liệu...</div>
+        <iframe id="ipMap" class="ip-map" loading="lazy"></iframe>
       </div>
     </div>
 
@@ -365,6 +395,24 @@
         alert("✅ Đã copy: " + pass);
       });
     }
+
+    // 🌍 Lấy thông tin IP & vị trí + bản đồ
+    fetch("https://ipapi.co/json/")
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("ipBox").innerHTML = `
+          <b>IP:</b> ${data.ip}<br>
+          <b>Quốc gia:</b> ${data.country_name} (${data.country})<br>
+          <b>Thành phố:</b> ${data.city}<br>
+          <b>Nhà mạng:</b> ${data.org}<br>
+          <b>Múi giờ:</b> ${data.timezone}
+        `;
+        document.getElementById("ipMap").src =
+          \`https://maps.google.com/maps?q=\${data.latitude},\${data.longitude}&z=10&output=embed\`;
+      })
+      .catch(() => {
+        document.getElementById("ipBox").textContent = "Không lấy được thông tin!";
+      });
 
     fetchData();
   </script>
