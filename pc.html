@@ -99,6 +99,38 @@
       transform: scale(1.1);
     }
 
+    /* 🌟 Support box (Neat) */
+    .support-box {
+      margin-top: 4px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .support-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .support-title img {
+      width: 22px;
+      height: 22px;
+      display: inline-block;
+    }
+    .neat-green {
+      color: #28a745; /* xanh lá */
+      font-weight: 800;
+    }
+    .support-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .main { flex: 1; }
 
     h2 {
@@ -141,6 +173,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      justify-content: center;
+      text-decoration: none;
     }
     .btn-download {
       background: linear-gradient(135deg, #00c6ff, #0072ff);
@@ -221,6 +255,18 @@
       <div class="password-list">
         <h4>📜 Danh sách mật khẩu</h4>
         <ul id="passwordList"></ul>
+      </div>
+
+      <!-- 🌐 Phần mềm hỗ trợ -->
+      <div class="support-box">
+        <div class="support-title">
+          <img src="https://www.neatdownloadmanager.com/templates/neat/images/icon.png" alt="Neat Icon">
+          <span><span class="neat-green">Neat</span>DownloadManager</span>
+        </div>
+        <div class="support-buttons">
+          <button class="btn-download" style="flex:1;" onclick="showPopup('https://www.neatdownloadmanager.com/file/NeatDM_setup.exe')">⬇️ Win</button>
+          <button class="btn-download" style="flex:1;" onclick="showPopup('https://www.neatdownloadmanager.com/file/NeatDMInstaller.dmg')">🍎 MacOS</button>
+        </div>
       </div>
     </div>
 
