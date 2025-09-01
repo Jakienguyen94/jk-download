@@ -10,43 +10,221 @@
       background: linear-gradient(135deg, #667eea, #764ba2);
       min-height: 100vh;
     }
+    /* shake animation */
+    @keyframes shake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.56s; }
   </style>
 </head>
 <body class="flex items-center justify-center text-white">
-  <div class="text-center space-y-6 bg-white/10 p-10 rounded-2xl shadow-xl backdrop-blur-md">
-    <h1 class="text-3xl md:text-4xl font-bold drop-shadow-lg">🔒 Nhập mật khẩu để truy cập</h1>
-    <input id="password" type="password" placeholder="Nhập mật khẩu..."
-           class="px-4 py-2 rounded-xl text-black w-64 text-center outline-none focus:ring-2 focus:ring-purple-400" />
-    <button onclick="checkPassword()" 
-            class="block mx-auto mt-4 bg-purple-600 hover:bg-purple-700 transition px-6 py-2 rounded-xl font-semibold">
-      Xác nhận
-    </button>
-    <p id="error" class="text-red-300 font-medium hidden">❌ Mật khẩu sai, thử lại!</p>
+  <div id="container" class="text-center space-y-6 bg-white/10 p-8 md:p-10 rounded-2xl shadow-xl backdrop-blur-md max-w-md w-full">
+    <h1 class="text-2xl md:text-3xl font-bold drop-shadow-lg">🔒 Nhập mật khẩu để truy cập</h1>
+
+    <div id="formArea" class="space-y-4">
+      <input id="password" type="password" placeholder="Nhập mật khẩu..."
+             class="px-4 py-2 rounded-xl text-black w-full text-center outline-none focus:ring-2 focus:ring-purple-400" />
+      <button id="okBtn"
+              class="w-full bg-purple-600 hover:bg-purple-700 transition px-6 py-2 rounded-xl font-semibold">
+        Xác nhận
+      </button>
+    </div>
+
+    <p id="error" class="text-red-300 font-medium hidden"></p>
+    <p id="hint" class="text-sm text-white/80">Bạn có 3 lần thử. Trang sẽ bị khóa sau 3 lần sai.</p>
   </div>
 
   <script>
-    // Hash SHA-256 của mật khẩu "061294"
-    const correctHash = "bfec289aa2582987e2791dd3fbb927a5c569f81e1809e2d4c7e1fa97d647bc1b";
+    // === Cấu hình ===
+    // SHA-256 của "061294" (chuẩn UTF-8)
+    const correctHash = "babba40d129b7c856356bb2814b4f333008717d313a7217517ece697c6074828";
+    const MAX_ATTEMPTS = 3;
 
-    async function sha256(message) {
-      const msgBuffer = new TextEncoder().encode(message);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    // Lấy số lần đã thử từ session (giữ trong cùng tab)
+    let attempts = Number(sessionStorage.getItem('protect_attempts') || 0);
+
+    const passwordInput = document.getElementById('password');
+    const okBtn = document.getElementById('okBtn');
+    const errorEl = document.getElementById('error');
+    const formArea = document.getElementById('formArea');
+
+    // Disable UI nếu đã vượt quá số lần
+    function lockUI() {
+      passwordInput.disabled = true;
+      okBtn.disabled = true;
+      errorEl.textContent = "🚫 Sai quá " + MAX_ATTEMPTS + " lần! Truy cập bị khóa.";
+      errorEl.classList.remove('hidden');
     }
 
-    async function checkPassword() {
-      const input = document.getElementById("password").value;
-      const hash = await sha256(input);
+    if (attempts >= MAX_ATTEMPTS) {
+      lockUI();
+    }
+
+    // Try Web Crypto first, fallback to JS
+    async function computeHash(input) {
+      input = input.trim(); // loại khoảng trắng vô ý
+      // nếu có Web Crypto
+      if (window.crypto && crypto.subtle && typeof crypto.subtle.digest === 'function') {
+        try {
+          const enc = new TextEncoder();
+          const buf = await crypto.subtle.digest('SHA-256', enc.encode(input));
+          return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+        } catch (e) {
+          // nếu lỗi thì rơi xuống fallback
+          console.warn('WebCrypto lỗi, dùng fallback JS', e);
+        }
+      }
+      // fallback: hàm SHA-256 JS (chuẩn)
+      return sha256_js(input);
+    }
+
+    // Hàm SHA-256 thuần JS (fallback). Implementation chuẩn với constants K
+    function sha256_js(ascii) {
+      function rightRotate(x, n) { return (x >>> n) | (x << (32 - n)); }
+
+      var K = [
+        0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+        0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+        0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+        0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+        0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+        0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+        0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+        0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+      ];
+
+      var H = [
+        0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,
+        0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19
+      ];
+
+      // Pre-processing
+      var msg = ascii;
+      var msgLenBits = msg.length * 8;
+      msg += '\x80';
+      while ((msg.length % 64) !== 56) msg += '\x00';
+
+      var words = [];
+      for (var i = 0; i < msg.length; i++) {
+        var code = msg.charCodeAt(i);
+        var wordIndex = (i >> 2);
+        words[wordIndex] = (words[wordIndex] || 0) | ((code & 0xff) << ((3 - i) % 4 * 8));
+      }
+      // append length
+      words[(msg.length >> 2)] = (words[(msg.length >> 2)] || 0);
+      words[words.length] = (msgLenBits / Math.pow(2, 32)) | 0;
+      words[words.length] = msgLenBits & 0xffffffff;
+
+      // process each 512-bit chunk
+      for (var j = 0; j < words.length; j += 16) {
+        var w = words.slice(j, j + 16);
+        for (var i = 16; i < 64; i++) {
+          var s0 = (rightRotate(w[i - 15], 7) ^ rightRotate(w[i - 15], 18) ^ (w[i - 15] >>> 3));
+          var s1 = (rightRotate(w[i - 2], 17) ^ rightRotate(w[i - 2], 19) ^ (w[i - 2] >>> 10));
+          w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+        }
+
+        var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+
+        for (i = 0; i < 64; i++) {
+          var S1 = (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25));
+          var ch = (e & f) ^ (~e & g);
+          var temp1 = (h + S1 + ch + K[i] + w[i]) | 0;
+          var S0 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22));
+          var maj = (a & b) ^ (a & c) ^ (b & c);
+          var temp2 = (S0 + maj) | 0;
+
+          h = g; g = f; f = e;
+          e = (d + temp1) | 0;
+          d = c; c = b; b = a;
+          a = (temp1 + temp2) | 0;
+        }
+
+        H[0] = (H[0] + a) | 0;
+        H[1] = (H[1] + b) | 0;
+        H[2] = (H[2] + c) | 0;
+        H[3] = (H[3] + d) | 0;
+        H[4] = (H[4] + e) | 0;
+        H[5] = (H[5] + f) | 0;
+        H[6] = (H[6] + g) | 0;
+        H[7] = (H[7] + h) | 0;
+      }
+
+      // produce the final hash value (hex)
+      var hex = '';
+      for (i = 0; i < H.length; i++) {
+        hex += ('00000000' + (H[i] >>> 0).toString(16)).slice(-8);
+      }
+      return hex;
+    }
+
+    // Hàm chính xử lý khi bấm
+    async function checkPasswordHandler() {
+      if (attempts >= MAX_ATTEMPTS) {
+        lockUI();
+        return;
+      }
+
+      okBtn.disabled = true;
+      const raw = passwordInput.value || '';
+      const value = raw.trim();
+
+      if (value.length === 0) {
+        showError("❗ Vui lòng nhập mật khẩu.");
+        okBtn.disabled = false;
+        return;
+      }
+
+      let hash;
+      try {
+        hash = await computeHash(value);
+      } catch (e) {
+        console.error('Hash compute error', e);
+        showError('Lỗi khi kiểm tra mật khẩu. Thử lại.');
+        okBtn.disabled = false;
+        return;
+      }
+
+      // Debug: in ra console (bạn có thể bỏ dòng này nếu muốn)
+      console.log('Computed hash:', hash);
 
       if (hash === correctHash) {
-        // Detect thiết bị
+        // thành công → xóa attempts
+        sessionStorage.removeItem('protect_attempts');
+        // detect device và redirect
         const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-        window.location.href = isMobile ? "mobile.html" : "pc.html";
+        window.location.href = isMobile ? 'mobile.html' : 'pc.html';
       } else {
-        document.getElementById("error").classList.remove("hidden");
+        attempts++;
+        sessionStorage.setItem('protect_attempts', attempts);
+        const left = Math.max(0, MAX_ATTEMPTS - attempts);
+        if (attempts >= MAX_ATTEMPTS) {
+          lockUI();
+        } else {
+          showError("❌ Mật khẩu sai! Còn " + left + " lần thử.");
+          // hiệu ứng rung
+          passwordInput.classList.add('shake');
+          setTimeout(() => passwordInput.classList.remove('shake'), 560);
+        }
+        okBtn.disabled = false;
       }
     }
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+    }
+
+    // Event bindings
+    okBtn.addEventListener('click', checkPasswordHandler);
+    passwordInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        checkPasswordHandler();
+      }
+    });
   </script>
 </body>
 </html>
