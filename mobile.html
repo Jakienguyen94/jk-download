@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0ea5e9" />
+  <title>🎁 TỔNG HỢP PHẦN MỀM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Header -->
+  <header class="safe-top sticky top-0 z-40 bg-cyan-600 text-white px-4 py-3 flex justify-between items-center">
+    <h1 class="text-lg font-semibold">TỔNG HỢP PHẦN MỀM</h1>
+    <button id="menuBtn" class="p-2 rounded-lg hover:bg-cyan-700">☰</button>
+  </header>
+
+  <!-- Main content -->
+  <main class="max-w-md mx-auto pb-24 px-4">
+    <!-- Search & Filter -->
+    <div class="my-4 space-y-2">
+      <input id="search" type="text" placeholder="🔎 Nhập tên phần mềm..." class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+      <select id="tabFilter" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"></select>
+      <select id="rowsPerPage" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        <option value="20">20 dòng / trang</option>
+        <option value="40">40 dòng / trang</option>
+        <option value="50">50 dòng / trang</option>
+        <option value="100">100 dòng / trang</option>
+      </select>
+    </div>
+
+    <!-- Password list -->
+    <div class="bg-white rounded-2xl p-4 shadow mb-4">
+      <h3 class="text-base font-semibold mb-2">📜 Danh sách mật khẩu</h3>
+      <ul id="passwordList" class="space-y-2 max-h-40 overflow-y-auto"></ul>
+    </div>
+
+    <!-- Table list -->
+    <div class="overflow-x-auto bg-white rounded-2xl shadow">
+      <table class="w-full text-sm">
+        <thead class="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white">
+          <tr>
+            <th class="p-2">STT</th>
+            <th class="p-2">Tên phần mềm</th>
+            <th class="p-2">Tab</th>
+            <th class="p-2">Upload</th>
+            <th class="p-2">Download</th>
+            <th class="p-2">Báo hỏng</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="pagination" class="flex justify-center mt-4 gap-2"></div>
+  </main>
+
+  <!-- Bottom bar -->
+  <nav class="safe-bottom fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2">
+    <button class="flex flex-col items-center text-cyan-600">
+      ⬇️<span class="text-xs">Trang chủ</span>
+    </button>
+    <button class="flex flex-col items-center text-slate-500">
+      ⚙️<span class="text-xs">Cài đặt</span>
+    </button>
+  </nav>
+
+  <!-- Popup -->
+  <div id="popup" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+    <div class="bg-white px-6 py-4 rounded-2xl shadow text-center">⏳ Đang chuyển trang tải xuống...</div>
+  </div>
+
+  <script>
+    const SHEET_ID = "15QEO6c15aqw0VfPXOUu0PstkVPz7f9nKhAj0JJmSz9g";
+    const SHEET_NAME = "Sheet1";
+    const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
+
+    let data = [], filteredData = [];
+    let currentPage = 1, rowsPerPage = 20;
+
+    async function fetchData() {
+      const res = await fetch(API_URL);
+      data = await res.json();
+      filteredData = data;
+      loadTabFilter();
+      renderTable();
+
+      const passwords = [...new Set(data.map(item => item["Mật khẩu"]).filter(p => p && p.trim() !== ""))];
+      const passwordList = document.getElementById("passwordList");
+      passwordList.innerHTML = "";
+      passwords.forEach(pass => {
+        const li = document.createElement("li");
+        li.className = "flex justify-between items-center bg-slate-100 rounded-lg px-3 py-1 text-sm";
+        li.innerHTML = `<span>${pass}</span><button class='px-2 py-1 bg-cyan-600 text-white rounded text-xs' onclick="copyPassword('${pass}')">Copy</button>`;
+        passwordList.appendChild(li);
+      });
+    }
+
+    function loadTabFilter() {
+      const tabs = [...new Set(data.map(item => item.Tab))];
+      const tabFilter = document.getElementById("tabFilter");
+      tabFilter.innerHTML = '<option value="">-- Lọc theo Tab --</option>';
+      tabs.forEach(tab => {
+        const opt = document.createElement("option");
+        opt.value = tab; opt.textContent = tab;
+        tabFilter.appendChild(opt);
+      });
+    }
+
+    function renderTable() {
+      const tableBody = document.getElementById("tableBody");
+      tableBody.innerHTML = "";
+      let start = (currentPage-1) * rowsPerPage;
+      let end = start + rowsPerPage;
+      let pageData = filteredData.slice(start, end);
+
+      pageData.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.className = "odd:bg-slate-50 hover:bg-cyan-50";
+        tr.innerHTML = `
+          <td class='p-2'>${row.STT}</td>
+          <td class='p-2'>${row["Tên phần mềm"]}</td>
+          <td class='p-2'>${row.Tab}</td>
+          <td class='p-2 text-pink-600 font-semibold'>${row.Upload || ""}</td>
+          <td class='p-2'><button class='px-3 py-1 bg-cyan-600 text-white rounded-full text-xs' onclick="showPopup('${row['Link tải xuống']}')">Download</button></td>
+          <td class='p-2'><button class='px-3 py-1 bg-red-500 text-white rounded-full text-xs' onclick="reportLink('${row["Tên phần mềm"]}', '${row['Link tải xuống']}')">Báo hỏng</button></td>`;
+        tableBody.appendChild(tr);
+      });
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+      let totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      for (let i=1; i<=totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = `px-3 py-1 rounded ${i===currentPage?'bg-cyan-600 text-white':'bg-slate-200'}`;
+        btn.onclick = () => { currentPage = i; renderTable(); };
+        pagination.appendChild(btn);
+      }
+    }
+
+    document.getElementById("search").addEventListener("input", e => {
+      const keyword = e.target.value.toLowerCase();
+      filteredData = data.filter(item =>
+        item["Tên phần mềm"].toLowerCase().includes(keyword) ||
+        item.Tab.toLowerCase().includes(keyword)
+      );
+      currentPage = 1;
+      renderTable();
+    });
+
+    document.getElementById("tabFilter").addEventListener("change", e => {
+      const val = e.target.value;
+      filteredData = val ? data.filter(item => item.Tab === val) : data;
+      currentPage = 1;
+      renderTable();
+    });
+
+    document.getElementById("rowsPerPage").addEventListener("change", e => {
+      rowsPerPage = parseInt(e.target.value);
+      currentPage = 1;
+      renderTable();
+    });
+
+    function showPopup(link) {
+      const popup = document.getElementById("popup");
+      popup.classList.remove("hidden");
+      setTimeout(() => {
+        popup.classList.add("hidden");
+        window.open(link, "_blank");
+      }, 1200);
+    }
+
+    function reportLink(name, link) {
+      const subject = encodeURIComponent("Báo link hỏng: " + name);
+      const body = encodeURIComponent(`Xin chào,\n\nLink tải phần mềm \"${name}\" đã bị hỏng.\nLink: ${link}\n\nNhờ admin kiểm tra lại.`);
+      window.location.href = `mailto:nhan.vhit94@gmail.com?subject=${subject}&body=${body}`;
+    }
+
+    function copyPassword(pass) {
+      navigator.clipboard.writeText(pass).then(() => {
+        alert("✅ Đã copy: " + pass);
+      });
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
