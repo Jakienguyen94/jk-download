@@ -72,7 +72,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 160px; /* giới hạn chiều cao */
+      max-height: 160px;
       overflow-y: auto;
     }
     .password-list li {
@@ -99,7 +99,7 @@
       transform: scale(1.1);
     }
 
-    /* 🌟 Support box (Neat) */
+    /* 🌟 Support box */
     .support-box {
       margin-top: 4px;
       background: #fff;
@@ -122,13 +122,25 @@
       display: inline-block;
     }
     .neat-green {
-      color: #28a745; /* xanh lá */
+      color: #28a745;
       font-weight: 800;
     }
     .support-buttons {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    /* 🖥️ Box hệ điều hành & đồng hồ */
+    .info-box {
+      margin-top: 4px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      font-size: 14px;
+      color: #444;
+      line-height: 1.6;
     }
 
     .main { flex: 1; }
@@ -160,7 +172,6 @@
     tbody tr:hover {background: #f0f0ff;}
     th { font-weight: 600; }
 
-    /* 🎨 Button download đẹp */
     .btn-download, .btn-report {
       padding: 8px 16px;
       font-size: 13px;
@@ -268,6 +279,12 @@
           <button class="btn-download" style="flex:1;" onclick="showPopup('https://www.neatdownloadmanager.com/file/NeatDMInstaller.dmg')">🍎 MacOS</button>
         </div>
       </div>
+
+      <!-- 🖥️ Box mới: Hệ điều hành + Đồng hồ -->
+      <div class="info-box">
+        <div>🖥️ Hệ điều hành: <span id="osInfo"></span></div>
+        <div>⏰ Giờ hiện tại: <span id="clock"></span></div>
+      </div>
     </div>
 
     <!-- Main -->
@@ -309,7 +326,7 @@
       loadTabFilter();
       renderTable();
 
-      // 📜 Danh sách mật khẩu (lọc trùng, bỏ rỗng)
+      // 📜 Danh sách mật khẩu
       const passwords = [...new Set(data.map(item => item["Mật khẩu"]).filter(p => p && p.trim() !== ""))];
       const passwordList = document.getElementById("passwordList");
       passwordList.innerHTML = "";
@@ -396,7 +413,7 @@
       popup.style.display = "flex";
       setTimeout(() => {
         popup.style.display = "none";
-        window.open(link, "_blank");
+        window.open(link, "_blank", "noopener,noreferrer");
       }, 1200);
     }
 
@@ -411,6 +428,29 @@
         alert("✅ Đã copy: " + pass);
       });
     }
+
+    // 🖥️ Lấy thông tin hệ điều hành
+    function detectOS() {
+      const ua = navigator.userAgent;
+      if (/Windows/i.test(ua)) return "Windows";
+      if (/Macintosh|Mac OS X/i.test(ua)) return "macOS";
+      if (/Linux/i.test(ua)) return "Linux";
+      if (/Android/i.test(ua)) return "Android";
+      if (/iPhone|iPad|iPod/i.test(ua)) return "iOS";
+      return "Không xác định";
+    }
+    document.getElementById("osInfo").textContent = detectOS();
+
+    // ⏰ Đồng hồ
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, "0");
+      const m = String(now.getMinutes()).padStart(2, "0");
+      const s = String(now.getSeconds()).padStart(2, "0");
+      document.getElementById("clock").textContent = `${h}:${m}:${s}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
     fetchData();
   </script>
